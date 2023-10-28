@@ -1,5 +1,6 @@
 package com.light672.roboscript.lang;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.light672.roboscript.lang.Token.TokenType.EOF;
@@ -7,18 +8,19 @@ import static com.light672.roboscript.lang.Token.TokenType.ERROR;
 
 public class Parser {
 	private final RoboScript roboScriptInstance;
-	Token previous;
-	Token current;
+	private Token previous;
+	private Token current;
 
-	Scanner scanner;
+	private Scanner scanner;
 
 	Parser(RoboScript roboScriptInstance) {
 		this.roboScriptInstance = roboScriptInstance;
 	}
 
-	private List<Statement> parse(String source) {
+	List<Statement> parse(String source) {
+		List<Statement> statements = new ArrayList<>();
 		this.scanner = new Scanner(source);
-		return null;
+		return statements;
 	}
 
 	private void advance() {
@@ -81,6 +83,10 @@ public class Parser {
 		finalMessage += ": '" + message + "'";
 		this.reportError(token.line, finalMessage);
 		return new ParseError();
+	}
+
+	boolean isAtEnd() {
+		return this.current.type == EOF;
 	}
 
 	private void reportError(int line, String finalMessage) {

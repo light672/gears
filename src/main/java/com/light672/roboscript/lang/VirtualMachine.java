@@ -7,10 +7,10 @@ public class VirtualMachine {
 
 
 	// actual vm stuff
-	final Object[] stack;
-	int stackSize = 0;
-	int programCounter = 0;
-	int basePointer = 0;
+	private final Object[] stack;
+	private int stackSize = 0;
+	private int programCounter = 0;
+	private int basePointer = 0;
 
 	private final Object[] globalVariables;
 
@@ -38,7 +38,8 @@ public class VirtualMachine {
 		try {
 			this.run();
 		} catch (RuntimeError e) {
-			this.roboScriptInstance.reportRuntimeError("[line " + this.chunk.lines[this.programCounter] + "]: " + e.message);
+			this.roboScriptInstance.reportRuntimeError(
+					"[line " + this.chunk.lines[this.programCounter] + "]: " + e.message);
 		}
 	}
 
@@ -49,6 +50,10 @@ public class VirtualMachine {
 
 			switch (this.readByte()) {
 				case OP_CONSTANT -> this.constantInstruction();
+				case OP_TRUE -> this.pushStack(true);
+				case OP_FALSE -> this.pushStack(false);
+				case OP_NULL -> this.pushStack(null);
+				case OP_POP -> this.roboScriptInstance.handlePrintStatement(this.stringify(this.popStack()) + '\n');
 				case OP_ADD -> this.addInstruction();
 				case OP_SUBTRACT -> this.subtractInstruction();
 				case OP_MULTIPLY -> this.multiplyInstruction();

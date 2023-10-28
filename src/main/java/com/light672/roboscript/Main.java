@@ -7,6 +7,11 @@ public class Main {
 		RoboScript roboScript = new RoboScript() {
 
 			@Override
+			public void handlePrintStatement(String message) {
+				System.out.print(message);
+			}
+
+			@Override
 			public void reportRuntimeError(String message) {
 				System.err.println(message);
 			}
@@ -21,5 +26,6 @@ public class Main {
 				System.out.println("WARNING: " + message);
 			}
 		};
+		roboScript.runString("");
 	}
 }
