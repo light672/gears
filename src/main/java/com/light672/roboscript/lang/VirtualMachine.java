@@ -38,7 +38,7 @@ public class VirtualMachine {
 		try {
 			this.run();
 		} catch (RuntimeError e) {
-			this.roboScriptInstance.reportRuntimeError(e.message);
+			this.roboScriptInstance.reportRuntimeError("[line " + this.chunk.lines[this.programCounter] + "]: " + e.message);
 		}
 	}
 

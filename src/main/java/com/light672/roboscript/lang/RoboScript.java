@@ -10,9 +10,13 @@ public abstract class RoboScript {
 
 	}
 
-	abstract void reportRuntimeError(String message);
+	public void runString(String message) {
 
-	abstract void reportCompilationError(String message);
+	}
 
-	abstract void reportCompilationWarning(String message);
+	public abstract void reportRuntimeError(String message);
+
+	public abstract void reportCompilationError(String message);
+
+	public abstract void reportCompilationWarning(String message);
 }
