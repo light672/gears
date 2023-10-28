@@ -58,6 +58,9 @@ public class VirtualMachine {
 				case OP_SUBTRACT -> this.subtractInstruction();
 				case OP_MULTIPLY -> this.multiplyInstruction();
 				case OP_DIVIDE -> this.divideInstruction();
+				case OP_JUMP -> this.jumpInstruction();
+				case OP_JUMP_IF_FALSE -> this.jumpIfFalseInstruction();
+				case OP_LOOP -> this.loopInstruction();
 				case OP_RETURN -> this.returnInstruction();
 				case OP_INTERRUPT -> {
 					return;
@@ -115,6 +118,20 @@ public class VirtualMachine {
 		this.pushStack((double) a * (double) b);
 	}
 
+	private void jumpInstruction() {
+		this.programCounter += this.readShort();
+	}
+
+	private void jumpIfFalseInstruction() {
+		short jump = this.readShort();
+		if (isTruthy(this.popStack()))
+			this.programCounter += jump;
+	}
+
+	private void loopInstruction() {
+		this.programCounter -= this.readShort();
+	}
+
 	private void returnInstruction() {
 		Object returnValue = this.popStack();
 		this.basePointer = (int) this.popStack();
@@ -157,5 +174,12 @@ public class VirtualMachine {
 			return text;
 		}
 		return object.toString();
+	}
+
+	private static boolean isTruthy(Object o) {
+		if (o == null) return false;
+		if (o instanceof Boolean b) return b;
+		if (o instanceof Double d) return d != 0;
+		return true;
 	}
 }

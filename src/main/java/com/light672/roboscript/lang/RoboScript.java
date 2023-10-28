@@ -17,7 +17,8 @@ public abstract class RoboScript {
 		Parser parser = new Parser(this);
 		// List<Statement> statements = parser.parse(source);
 		List<Statement> statements = Arrays.asList(new Statement.ExpressionStatement(
-				new Expression.Binary(new Expression.Literal(3d), new Expression.Literal(4d),
+				new Expression.Binary(new Expression.Binary(new Expression.Literal(5d), new Expression.Literal(2d),
+						Expression.Binary.Type.SUBTRACTION), new Expression.Literal(4d),
 						Expression.Binary.Type.ADDITION)));
 		Compiler compiler = new Compiler(this);
 		Chunk chunk = compiler.compile(statements);
