@@ -6,8 +6,8 @@ import static com.light672.roboscript.lang.OpCode.*;
 
 public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Void> {
 	private final RoboScript roboScriptInstance;
-	private List<Byte> code = new ArrayList<>();
-	private List<Object> constants = new ArrayList<>();
+	private final List<Byte> code = new ArrayList<>();
+	private final List<Object> constants = new ArrayList<>();
 
 	Compiler(RoboScript roboScriptInstance) {
 		this.roboScriptInstance = roboScriptInstance;
@@ -26,10 +26,30 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 		return new Chunk(code, this.constants.toArray(), lines);
 	}
 
+	private void compileBlock(List<Statement> statements) {
+		for (Statement statement : statements) {
+			this.accept(statement);
+		}
+	}
+
 	@Override
 	public Void visitExpressionStatement(Statement.ExpressionStatement statement) {
 		this.accept(statement.expression);
 		this.emitByte(OP_POP);
+		return null;
+	}
+
+	@Override
+	public Void visitIfStatement(Statement.If statement) {
+		this.accept(statement.condition);
+		int thenJump = this.emitJump(OP_JUMP_IF_FALSE);
+		this.emitByte(OP_POP); // pop the condition
+		this.compileBlock(statement.thenBranch);
+		int elseJump = this.emitJump(OP_JUMP);
+		this.patchJump(thenJump);
+		this.emitByte(OP_POP);
+
+		this.patchJump(elseJump);
 		return null;
 	}
 
@@ -68,12 +88,35 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 
 	private void emitConstant(Object o) {
 		this.emitBytes(OP_CONSTANT);
-		this.emitShort((short) this.constants.size());
 		this.constants.add(o);
+		this.emitShort((short) (this.constants.size() - 1));
+	}
+
+	private int emitJump(byte instruction) {
+		this.emitBytes(instruction, (byte) 0xFF, (byte) 0xFF);
+		return this.code.size() - 2;
+	}
+
+	private void patchJump(int offset) {
+		int jump = this.code.size() - offset - 2;
+		if (jump > Short.MAX_VALUE) {
+			// too much code to jump over throw error
+			return;
+		}
+		byte[] s = this.shortToBytes((short) jump);
+		this.code.set(offset, s[0]);
+		this.code.set(offset + 1, s[1]);
 	}
 
 	private void emitShort(short s) {
 		this.emitBytes((byte) ((s >> 8) & 0xFF), (byte) (s & 0xFF));
+	}
+
+	private byte[] shortToBytes(short s) {
+		byte[] b = new byte[2];
+		b[0] = (byte) ((s >> 8) & 0xFF);
+		b[1] = (byte) (s & 0xFF);
+		return b;
 	}
 
 	private void emitByte(byte code) {

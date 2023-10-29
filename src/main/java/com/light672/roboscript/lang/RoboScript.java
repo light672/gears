@@ -1,5 +1,4 @@
 package com.light672.roboscript.lang;
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class RoboScript {
@@ -16,12 +15,19 @@ public abstract class RoboScript {
 	public void runString(String source) {
 		Parser parser = new Parser(this);
 		// List<Statement> statements = parser.parse(source);
-		List<Statement> statements = Arrays.asList(new Statement.ExpressionStatement(
-				new Expression.Binary(new Expression.Binary(new Expression.Literal(5d), new Expression.Literal(2d),
-						Expression.Binary.Type.SUBTRACTION), new Expression.Literal(4d),
-						Expression.Binary.Type.ADDITION)));
+		List<Statement> statements = List.of(
+				new Statement.If(new Expression.Literal(true), List.of(
+						new Statement.ExpressionStatement(new Expression.Literal("ended up being true"))
+				), List.of(
+						new Statement.ExpressionStatement(new Expression.Literal("ended up being false"))
+				)),
+				new Statement.ExpressionStatement(new Expression.Literal("end"))
+		);
+
 		Compiler compiler = new Compiler(this);
 		Chunk chunk = compiler.compile(statements);
+		new Printer(chunk).print();
+		System.out.println("\n");
 		VirtualMachine vm = new VirtualMachine(this);
 		vm.interpret(chunk);
 	}

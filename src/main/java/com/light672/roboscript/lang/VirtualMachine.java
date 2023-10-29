@@ -124,7 +124,7 @@ public class VirtualMachine {
 
 	private void jumpIfFalseInstruction() {
 		short jump = this.readShort();
-		if (isTruthy(this.popStack()))
+		if (!isTruthy(this.peekStack()))
 			this.programCounter += jump;
 	}
 
