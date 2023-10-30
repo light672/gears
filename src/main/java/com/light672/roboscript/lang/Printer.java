@@ -37,12 +37,12 @@ public class Printer {
 
 	String shortInstruction(String s) {
 
-		return String.format("%03d  %s  %05d", this.printCounter, s, this.readShort());
+		return String.format("%03d  %s  %03d", this.printCounter, s, this.readShort());
 	}
 
 	String byteInstruction(String s) {
 		byte num = this.readByte();
-		return String.format("%03d  %s  %05d", this.printCounter, s, num);
+		return String.format("%03d  %s  %03d", this.printCounter, s, num);
 	}
 
 	private byte readByte() {
@@ -51,6 +51,6 @@ public class Printer {
 
 	private short readShort() {
 		this.printCounter += 2;
-		return (short) ((this.chunk.code[this.printCounter - 2] << 8) | (this.chunk.code[this.printCounter - 1] & 0xFF));
+		return (short) ((this.chunk.code[this.printCounter - 1] << 8) | (this.chunk.code[this.printCounter] & 0xFF));
 	}
 }
