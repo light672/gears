@@ -48,7 +48,7 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 		int elseJump = this.emitJump(OP_JUMP);
 		this.patchJump(thenJump);
 		this.emitByte(OP_POP);
-
+		this.compileBlock(statement.elseBranch);
 		this.patchJump(elseJump);
 		return null;
 	}

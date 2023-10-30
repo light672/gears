@@ -119,7 +119,7 @@ public class VirtualMachine {
 	}
 
 	private void jumpInstruction() {
-		this.programCounter += this.readShort();
+		this.programCounter = this.readShort() + this.programCounter; // cannot be +=, readShort() changes pc and the old pc gets used in addition.
 	}
 
 	private void jumpIfFalseInstruction() {
@@ -129,7 +129,8 @@ public class VirtualMachine {
 	}
 
 	private void loopInstruction() {
-		this.programCounter -= this.readShort();
+		short jumpLocation = this.readShort();
+		this.programCounter -= jumpLocation;
 	}
 
 	private void returnInstruction() {
