@@ -6,6 +6,8 @@ abstract class Statement {
 		R visitExpressionStatement(ExpressionStatement statement);
 
 		R visitIfStatement(If statement);
+
+		R visitLoopStatement(Loop statement);
 	}
 
 	static class ExpressionStatement extends Statement {
@@ -37,6 +39,19 @@ abstract class Statement {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitIfStatement(this);
+		}
+	}
+
+	static class Loop extends Statement {
+		Loop(List<Statement> body) {
+			this.body = body;
+		}
+
+		final List<Statement> body;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitLoopStatement(this);
 		}
 	}
 

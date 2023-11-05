@@ -26,12 +26,6 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 		return new Chunk(code, this.constants.toArray(), lines);
 	}
 
-	private void compileBlock(List<Statement> statements) {
-		for (Statement statement : statements) {
-			this.accept(statement);
-		}
-	}
-
 	@Override
 	public Void visitExpressionStatement(Statement.ExpressionStatement statement) {
 		this.accept(statement.expression);
@@ -44,12 +38,20 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 		this.accept(statement.condition);
 		int thenJump = this.emitJump(OP_JUMP_IF_FALSE);
 		this.emitByte(OP_POP); // pop the condition
-		this.compileBlock(statement.thenBranch);
+		this.accept(statement.thenBranch);
 		int elseJump = this.emitJump(OP_JUMP);
 		this.patchJump(thenJump);
 		this.emitByte(OP_POP);
-		this.compileBlock(statement.elseBranch);
+		this.accept(statement.elseBranch);
 		this.patchJump(elseJump);
+		return null;
+	}
+
+	@Override
+	public Void visitLoopStatement(Statement.Loop statement) {
+		int loopStart = this.code.size();
+		this.accept(statement.body);
+		this.emitLoop(loopStart);
 		return null;
 	}
 
@@ -86,6 +88,12 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 		s.accept(this);
 	}
 
+	private void accept(List<Statement> statements) {
+		for (Statement statement : statements) {
+			this.accept(statement);
+		}
+	}
+
 	private void emitConstant(Object o) {
 		this.emitBytes(OP_CONSTANT);
 		this.constants.add(o);
@@ -106,6 +114,16 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 		byte[] s = this.shortToBytes((short) jump);
 		this.code.set(offset, s[0]);
 		this.code.set(offset + 1, s[1]);
+	}
+
+	private void emitLoop(int loopStart) {
+		this.emitByte(OP_LOOP);
+		int offset = this.code.size() - loopStart + 2;
+		if (offset > Short.MAX_VALUE) {
+			// too much code to jump over throw error
+			return;
+		}
+		this.emitShort((short) offset);
 	}
 
 	private void emitShort(short s) {
