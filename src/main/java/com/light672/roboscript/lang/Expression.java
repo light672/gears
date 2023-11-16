@@ -78,7 +78,7 @@ abstract class Expression {
 	}
 
 	static class Binary extends Expression {
-		enum Type {
+		enum Operation {
 			ADDITION,
 			SUBTRACTION,
 			MULTIPLICATION,
@@ -94,15 +94,15 @@ abstract class Expression {
 
 		}
 
-		Binary(Expression left, Expression right, Type type) {
+		Binary(Expression left, Expression right, Operation operation) {
 			this.left = left;
 			this.right = right;
-			this.type = type;
+			this.operation = operation;
 		}
 
 		final Expression left;
 		final Expression right;
-		final Type type;
+		final Operation operation;
 
 		@Override
 		<R> R accept(Visitor<R> visitor) {
@@ -111,18 +111,18 @@ abstract class Expression {
 	}
 
 	static class Unary extends Expression {
-		enum Type {
+		enum Operation {
 			NOT,
 			NEGATE
 		}
 
-		Unary(Expression expression, Type type) {
+		Unary(Expression expression, Operation operation) {
 			this.expression = expression;
-			this.type = type;
+			this.operation = operation;
 		}
 
 		final Expression expression;
-		final Type type;
+		final Operation operation;
 
 		@Override
 		<R> R accept(Visitor<R> visitor) {
@@ -131,20 +131,20 @@ abstract class Expression {
 	}
 
 	static class Logical extends Expression {
-		enum Type {
+		enum Operation {
 			AND,
 			OR
 		}
 
-		Logical(Expression left, Expression right, Type type) {
+		Logical(Expression left, Expression right, Operation operation) {
 			this.left = left;
 			this.right = right;
-			this.type = type;
+			this.operation = operation;
 		}
 
 		final Expression left;
 		final Expression right;
-		final Type type;
+		final Operation operation;
 
 		@Override
 		<R> R accept(Visitor<R> visitor) {

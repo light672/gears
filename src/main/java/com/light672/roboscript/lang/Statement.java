@@ -8,6 +8,9 @@ abstract class Statement {
 		R visitIfStatement(If statement);
 
 		R visitLoopStatement(Loop statement);
+
+		R visitVarStatement(Var statement);
+
 	}
 
 	static class ExpressionStatement extends Statement {
@@ -21,6 +24,26 @@ abstract class Statement {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitExpressionStatement(this);
+		}
+	}
+
+	static class Var extends Statement {
+
+		Var(Token name, Type type, Expression initializer, boolean functionArgument) {
+			this.name = name;
+			this.type = type;
+			this.initializer = initializer;
+			this.functionArgument = functionArgument;
+		}
+
+		final Token name;
+		final Type type;
+		final Expression initializer;
+		final boolean functionArgument;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitVarStatement(this);
 		}
 	}
 

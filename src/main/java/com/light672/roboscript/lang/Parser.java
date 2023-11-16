@@ -40,6 +40,79 @@ public class Parser {
 		}
 	}
 
+	private Statement varDeclaration() {
+
+	}
+
+	private Statement parseVariable(boolean functionArgument) {
+		this.consumeOrThrow(IDENTIFIER, "Expected variable name.");
+		Token name = this.previous;
+		Type type;
+		if (this.matchAndAdvance(COLON)) {
+			type = this.parseType("Expected a type after ':'.");
+		} else {
+			type = new Type.Any(true);
+		}
+		Expression initializer = null;
+		if (this.matchAndAdvance(EQUAL)) {
+			initializer = this.exponent();
+		}
+		this.consumeOrThrow(SEMICOLON, "Expected ';' after statement.");
+		return new Statement.Var(name, type, initializer, functionArgument);
+	}
+
+	private Type parseType(String errorMessage) {
+		if (!this.matchAndAdvance(ANY, STRING, NUMBER, BOOL, RANGE, LIST, MAP, FUNCTION, CLASS, IDENTIFIER)) {
+			throw this.errorAtCurrent(errorMessage);
+		}
+		Token typeToken = this.previous;
+		boolean nullable = this.matchAndAdvance(QUESTION);
+		return switch (typeToken.type) {
+			case ANY -> new Type.Any(nullable);
+			case STRING -> new Type.String(nullable);
+			case NUMBER -> {
+				if (nullable) throw this.error("Type 'number' cannot be nullable.");
+				yield new Type.Number();
+			}
+			case BOOL -> {
+				if (nullable) throw this.error("Type 'bool' cannot be nullable.");
+				yield new Type.Bool();
+			}
+			case RANGE -> new Type.Range(nullable);
+			case LIST -> {
+				if (!this.matchAndAdvance(LESS)) yield new Type.List(new Type.Any(true), nullable);
+				Type t = new Type.List(this.parseType("Expected a type after '<'."), nullable);
+				this.consumeOrThrow(GREATER, "Expected '>' after list entry type.");
+				yield t;
+			}
+			case MAP -> {
+				if (!this.matchAndAdvance(LESS)) yield new Type.Map(new Type.Any(true), new Type.Any(true), nullable);
+				Type keyType = this.parseType("Expected a type for map key type.");
+				this.consumeOrThrow(COMMA, "Expected ',' after key type.");
+				Type valueType = this.parseType("Expected a type for map value type.");
+				this.consumeOrThrow(GREATER, "Expected '>' after map value type.");
+				yield new Type.Map(keyType, valueType, nullable);
+			}
+			case FUNCTION -> {
+				List<Type> argTypes = new ArrayList<>();
+				if (this.matchAndAdvance(LESS)) {
+					do {
+						argTypes.add(this.parseType("Expected a type in function type arguments."));
+					} while (this.matchAndAdvance(COMMA));
+					this.consumeOrThrow(GREATER, "Expected '>' after function type arguments.");
+				}
+				Type returnType = this.matchAndAdvance(ARROW) ? this.parseType(
+						"Expected a type in function type return type.") : new Type.Any(true);
+				yield new Type.Function(argTypes, returnType, nullable);
+			}
+			case CLASS -> new Type.Class(nullable);
+			case IDENTIFIER -> {
+				// wait so if classes are just variables with class objects that means they can change and the value assigned to that name can change ://///
+				// how about i just do this later :D
+			}
+			default -> throw new IllegalArgumentException("this should not be possible");
+		};
+	}
 
 	private Statement statement() {
 		if (this.matchAndAdvance(IF)) {
@@ -83,7 +156,7 @@ public class Parser {
 		Expression expression = this.and();
 		while (this.matchAndAdvance(OR)) {
 			Expression right = this.and();
-			expression = new Expression.Logical(expression, right, Expression.Logical.Type.OR);
+			expression = new Expression.Logical(expression, right, Expression.Logical.Operation.OR);
 		}
 		return expression;
 	}
@@ -93,7 +166,7 @@ public class Parser {
 		while (this.matchAndAdvance(BANG_EQUAL, EQUAL_EQUAL)) {
 			Token operator = this.previous;
 			Expression right = this.equality();
-			expression = new Expression.Logical(expression, right, Expression.Logical.Type.AND);
+			expression = new Expression.Logical(expression, right, Expression.Logical.Operation.AND);
 		}
 		return expression;
 	}
@@ -104,7 +177,7 @@ public class Parser {
 			Token operator = this.previous;
 			Expression right = this.comparison();
 			expression = new Expression.Binary(expression, right,
-					operator.type == EQUAL_EQUAL ? Expression.Binary.Type.EQUAL : Expression.Binary.Type.NOT_EQUAL);
+					operator.type == EQUAL_EQUAL ? Expression.Binary.Operation.EQUAL : Expression.Binary.Operation.NOT_EQUAL);
 		}
 		return expression;
 	}
@@ -115,10 +188,10 @@ public class Parser {
 			Token operator = this.previous;
 			Expression right = this.modulo();
 			expression = new Expression.Binary(expression, right, switch (operator.type) {
-				case GREATER -> Expression.Binary.Type.GREATER;
-				case GREATER_EQUAL -> Expression.Binary.Type.GREATER_EQUAL;
-				case LESS -> Expression.Binary.Type.LESS;
-				case LESS_EQUAL -> Expression.Binary.Type.LESS_EQUAL;
+				case GREATER -> Expression.Binary.Operation.GREATER;
+				case GREATER_EQUAL -> Expression.Binary.Operation.GREATER_EQUAL;
+				case LESS -> Expression.Binary.Operation.LESS;
+				case LESS_EQUAL -> Expression.Binary.Operation.LESS_EQUAL;
 				default -> throw new IllegalArgumentException("how did this happen?");
 			});
 		}
@@ -130,7 +203,7 @@ public class Parser {
 		while (this.matchAndAdvance(PERCENT)) {
 			Token operator = this.previous;
 			Expression right = this.term();
-			expression = new Expression.Binary(expression, right, Expression.Binary.Type.MODULO);
+			expression = new Expression.Binary(expression, right, Expression.Binary.Operation.MODULO);
 		}
 		return expression;
 	}
@@ -141,7 +214,7 @@ public class Parser {
 			Token operator = this.previous;
 			Expression right = this.factor();
 			expression = new Expression.Binary(expression, right,
-					operator.type == PLUS ? Expression.Binary.Type.ADDITION : Expression.Binary.Type.SUBTRACTION);
+					operator.type == PLUS ? Expression.Binary.Operation.ADDITION : Expression.Binary.Operation.SUBTRACTION);
 		}
 		return expression;
 	}
@@ -152,7 +225,7 @@ public class Parser {
 			Token operator = this.previous;
 			Expression right = this.exponent();
 			expression = new Expression.Binary(expression, right,
-					operator.type == SLASH ? Expression.Binary.Type.DIVISION : Expression.Binary.Type.MULTIPLICATION);
+					operator.type == SLASH ? Expression.Binary.Operation.DIVISION : Expression.Binary.Operation.MULTIPLICATION);
 		}
 		return expression;
 	}
@@ -162,7 +235,7 @@ public class Parser {
 		while (this.matchAndAdvance(CARET)) {
 			Token operator = this.previous;
 			Expression right = this.unary();
-			expression = new Expression.Binary(expression, right, Expression.Binary.Type.EXPONENT);
+			expression = new Expression.Binary(expression, right, Expression.Binary.Operation.EXPONENT);
 		}
 		return expression;
 	}
@@ -172,7 +245,7 @@ public class Parser {
 			Token operator = this.previous;
 			Expression expression = this.unary();
 			return new Expression.Unary(expression,
-					operator.type == BANG ? Expression.Unary.Type.NOT : Expression.Unary.Type.NEGATE);
+					operator.type == BANG ? Expression.Unary.Operation.NOT : Expression.Unary.Operation.NEGATE);
 		}
 		return this.call();
 	}

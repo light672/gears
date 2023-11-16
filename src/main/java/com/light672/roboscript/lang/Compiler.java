@@ -59,7 +59,7 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 	public Void visitBinaryExpression(Expression.Binary expression) {
 		this.accept(expression.left);
 		this.accept(expression.right);
-		this.emitByte(switch (expression.type) {
+		this.emitByte(switch (expression.operation) {
 			case ADDITION -> OP_ADD;
 			case SUBTRACTION -> OP_SUBTRACT;
 			case MULTIPLICATION -> OP_MULTIPLY;

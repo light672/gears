@@ -49,6 +49,7 @@ final class Token {
 		GREATER_EQUAL,
 		LESS,
 		LESS_EQUAL,
+		ARROW,
 
 		// Literals.
 		IDENTIFIER,
@@ -85,6 +86,7 @@ final class Token {
 		BOOL,
 		RANGE,
 		LIST,
+		MAP,
 
 
 		EOF,

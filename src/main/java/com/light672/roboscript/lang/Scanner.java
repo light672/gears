@@ -82,9 +82,10 @@ final class Scanner {
 				}
 				return this.addToken(this.consumeIfNextCharMatches('=') ? PLUS_EQUAL : PLUS);
 			case '-':
-				if (this.consumeIfNextCharMatches('-')) {
+				if (this.consumeIfNextCharMatches('-'))
 					return this.addToken(MINUS_MINUS);
-				}
+				if (this.consumeIfNextCharMatches('>'))
+					return this.addToken(ARROW);
 				return this.addToken(this.consumeIfNextCharMatches('=') ? MINUS_EQUAL : MINUS);
 			case '*':
 				return this.addToken(this.consumeIfNextCharMatches('=') ? STAR_EQUAL : STAR);
@@ -249,6 +250,10 @@ final class Scanner {
 								return this.checkKeyword(3, 3, "ber", NUMBER);
 						}
 					}
+			}
+			// map
+			case 'm' -> {
+				return this.checkKeyword(1, 2, "ap", MAP);
 			}
 			// or
 			case 'o' -> {
