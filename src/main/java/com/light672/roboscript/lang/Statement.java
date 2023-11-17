@@ -29,17 +29,19 @@ abstract class Statement {
 
 	static class Var extends Statement {
 
-		Var(Token name, Type type, Expression initializer, boolean functionArgument) {
+		Var(Token name, Type type, Expression initializer, boolean functionArgument, boolean constant) {
 			this.name = name;
 			this.type = type;
 			this.initializer = initializer;
 			this.functionArgument = functionArgument;
+			this.constant = constant;
 		}
 
 		final Token name;
 		final Type type;
 		final Expression initializer;
 		final boolean functionArgument;
+		final boolean constant;
 
 		@Override
 		<R> R accept(Visitor<R> visitor) {

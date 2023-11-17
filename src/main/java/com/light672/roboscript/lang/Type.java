@@ -7,7 +7,7 @@ public class Type {
 	}
 
 	static class Object extends Type {
-		Object(boolean nullable, Token identifier) {
+		Object(Token identifier, boolean nullable) {
 			super(nullable);
 			this.identifier = identifier;
 		}
@@ -72,9 +72,12 @@ public class Type {
 	}
 
 	static class Class extends Type {
-		Class(boolean nullable) {
+		Class(Token identifier, boolean nullable) {
 			super(nullable);
+			this.identifier = identifier;
 		}
+
+		final Token identifier;
 	}
 
 

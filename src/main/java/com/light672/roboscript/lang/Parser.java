@@ -58,7 +58,7 @@ public class Parser {
 			initializer = this.exponent();
 		}
 		this.consumeOrThrow(SEMICOLON, "Expected ';' after statement.");
-		return new Statement.Var(name, type, initializer, functionArgument);
+		return new Statement.Var(name, type, initializer, functionArgument, false);
 	}
 
 	private Type parseType(String errorMessage) {
@@ -105,11 +105,16 @@ public class Parser {
 						"Expected a type in function type return type.") : new Type.Any(true);
 				yield new Type.Function(argTypes, returnType, nullable);
 			}
-			case CLASS -> new Type.Class(nullable);
-			case IDENTIFIER -> {
-				// wait so if classes are just variables with class objects that means they can change and the value assigned to that name can change ://///
-				// how about i just do this later :D
+			case CLASS -> {
+				Token identifier = null;
+				if (this.matchAndAdvance(LESS)) {
+					this.consumeOrThrow(IDENTIFIER, "Expected a class name after '<'.");
+					identifier = this.previous;
+					this.consumeOrThrow(GREATER, "Expected '>' after class type.");
+				}
+				yield new Type.Class(identifier, nullable);
 			}
+			case IDENTIFIER -> new Type.Object(typeToken, nullable);
 			default -> throw new IllegalArgumentException("this should not be possible");
 		};
 	}
