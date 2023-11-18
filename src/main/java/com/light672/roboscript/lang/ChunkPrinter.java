@@ -1,11 +1,11 @@
 package com.light672.roboscript.lang;
 import static com.light672.roboscript.lang.OpCode.*;
 
-public class Printer {
+public class ChunkPrinter {
 	private int printCounter = 0;
 	final Chunk chunk;
 
-	Printer(Chunk chunk) {
+	ChunkPrinter(Chunk chunk) {
 		this.chunk = chunk;
 	}
 

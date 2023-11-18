@@ -26,7 +26,7 @@ public abstract class RoboScript {
 
 		Compiler compiler = new Compiler(this);
 		Chunk chunk = compiler.compile(statements);
-		new Printer(chunk).print();
+		new ChunkPrinter(chunk).print();
 		System.out.println("\n");
 		VirtualMachine vm = new VirtualMachine(this);
 		vm.interpret(chunk);
