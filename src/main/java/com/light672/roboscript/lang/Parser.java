@@ -25,6 +25,15 @@ public class Parser {
 		return statements;
 	}
 
+	private List<Statement> parseBlock() {
+		List<Statement> statements = new ArrayList<>();
+		while (this.isNextToken(RIGHT_BRACE) && !this.isAtEnd()) {
+			statements.add(this.declaration());
+		}
+		this.consumeOrThrow(RIGHT_BRACE, "Expected '}' to close block.");
+		return statements;
+	}
+
 	private Statement declaration() {
 		try {
 			if (this.matchAndAdvance(VAR)) {
@@ -44,7 +53,7 @@ public class Parser {
 
 	}
 
-	private Statement parseVariable(boolean functionArgument) {
+	private Statement.Var parseVariable(boolean constant) {
 		this.consumeOrThrow(IDENTIFIER, "Expected variable name.");
 		Token name = this.previous;
 		Type type;
@@ -58,7 +67,7 @@ public class Parser {
 			initializer = this.exponent();
 		}
 		this.consumeOrThrow(SEMICOLON, "Expected ';' after statement.");
-		return new Statement.Var(name, type, initializer, functionArgument, false);
+		return new Statement.Var(name, type, initializer, constant);
 	}
 
 	private Type parseType(String errorMessage) {
@@ -133,6 +142,50 @@ public class Parser {
 		} else {
 			return this.expressionStatement();
 		}
+	}
+
+	private Statement.If ifStatement() {
+		Expression expression = this.expression();
+		this.consumeOrThrow(LEFT_BRACE, "Expected '{' after if statement expression.");
+		List<Statement> block = this.parseBlock();
+		List<Statement> elseBlock;
+		if (this.matchAndAdvance(ELSE)) {
+			if (this.matchAndAdvance(IF)) {
+				elseBlock = List.of(this.ifStatement());
+			} else {
+				this.consumeOrThrow(LEFT_BRACE, "Expected '{' after 'else'.");
+				elseBlock = this.parseBlock();
+			}
+		} else if (this.matchAndAdvance(ELIF)) {
+			elseBlock = List.of(this.ifStatement());
+		} else {
+			elseBlock = new ArrayList<>();
+		}
+		return new Statement.If(expression, block, elseBlock);
+	}
+
+	private Statement.While whileStatement() {
+		Expression expression = this.expression();
+		this.consumeOrThrow(LEFT_BRACE, "Expected '{' after while statement expression.");
+		return new Statement.While(expression, this.parseBlock());
+	}
+
+	private Statement.For forStatement() {
+		this.consumeOrThrow(IDENTIFIER, "Expected variable name after 'for'.");
+		Statement.Var iterator = this.parseVariable(true);
+		this.consumeOrThrow(COLON, "Expected ':' after variable name.");
+		Expression iterable = this.expression();
+		this.consumeOrThrow(LEFT_BRACE, "Expected '{' after for loop iterable.");
+		return new Statement.For(iterator, iterable, this.parseBlock());
+	}
+
+	private Statement.Loop loopStatement() {
+		this.consumeOrThrow(LEFT_BRACE, "Expected '{' after 'loop'.");
+		return new Statement.Loop(this.parseBlock());
+	}
+
+	private Statement.Return returnStatement() {
+
 	}
 
 	private Statement.ExpressionStatement expressionStatement() {
@@ -358,7 +411,7 @@ public class Parser {
 		return new ParseError();
 	}
 
-	boolean isAtEnd() {
+	private boolean isAtEnd() {
 		return this.current.type == EOF;
 	}
 

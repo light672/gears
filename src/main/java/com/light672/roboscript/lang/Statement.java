@@ -5,12 +5,15 @@ abstract class Statement {
 	interface Visitor<R> {
 		R visitExpressionStatement(ExpressionStatement statement);
 
+		R visitVarStatement(Var statement);
+
 		R visitIfStatement(If statement);
 
 		R visitLoopStatement(Loop statement);
 
-		R visitVarStatement(Var statement);
+		R visitWhileStatement(While statement);
 
+		R visitForStatement(For statement);
 	}
 
 	static class ExpressionStatement extends Statement {
@@ -29,18 +32,16 @@ abstract class Statement {
 
 	static class Var extends Statement {
 
-		Var(Token name, Type type, Expression initializer, boolean functionArgument, boolean constant) {
+		Var(Token name, Type type, Expression initializer, boolean constant) {
 			this.name = name;
 			this.type = type;
 			this.initializer = initializer;
-			this.functionArgument = functionArgument;
 			this.constant = constant;
 		}
 
 		final Token name;
 		final Type type;
 		final Expression initializer;
-		final boolean functionArgument;
 		final boolean constant;
 
 		@Override
@@ -77,6 +78,36 @@ abstract class Statement {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitLoopStatement(this);
+		}
+	}
+
+	static class While extends Statement {
+		While(Expression condition, List<Statement> body) {
+			this.body = body;
+		}
+
+		final List<Statement> body;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitWhileStatement(this);
+		}
+	}
+
+	static class For extends Statement {
+		For(Var iterator, Expression iterable, List<Statement> body) {
+			this.iterator = iterator;
+			this.iterable = iterable;
+			this.body = body;
+		}
+
+		final Var iterator;
+		final Expression iterable;
+		final List<Statement> body;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitForStatement(this);
 		}
 	}
 
