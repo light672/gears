@@ -49,11 +49,27 @@ public class Parser {
 		}
 	}
 
-	private Statement varDeclaration() {
-
+	private Statement.Var varDeclaration() {
+		return this.parseVariable(false, true);
 	}
 
-	private Statement.Var parseVariable(boolean constant) {
+	private Statement.Function functionDeclaration() {
+		this.consumeOrThrow(IDENTIFIER, "Expected function name after 'func'.");
+		this.consumeOrThrow(LEFT_PAREN, "Expected '(' after function name.");
+		List<Statement.Var> parameters = new ArrayList<>();
+		if (!this.isNextToken(RIGHT_PAREN)) {
+			do {
+				parameters.add(this.parseVariable(false, false));
+			} while (this.matchAndAdvance(COMMA));
+		}
+		this.consumeOrThrow(RIGHT_PAREN, "Expected ')' after function parameters.");
+		Type returnType = this.matchAndAdvance(ARROW) ? this.parseType("Expected a type after '->'.") : new Type.Any(
+				true);
+		this.consumeOrThrow(LEFT_BRACE, "Expected '{' before function body.");
+		return new Statement.Function(parameters, returnType, this.parseBlock());
+	}
+
+	private Statement.Var parseVariable(boolean constant, boolean allowInitializer) {
 		this.consumeOrThrow(IDENTIFIER, "Expected variable name.");
 		Token name = this.previous;
 		Type type;
@@ -63,9 +79,10 @@ public class Parser {
 			type = new Type.Any(true);
 		}
 		Expression initializer = null;
-		if (this.matchAndAdvance(EQUAL)) {
-			initializer = this.exponent();
-		}
+		if (allowInitializer)
+			if (this.matchAndAdvance(EQUAL)) {
+				initializer = this.exponent();
+			}
 		this.consumeOrThrow(SEMICOLON, "Expected ';' after statement.");
 		return new Statement.Var(name, type, initializer, constant);
 	}
@@ -172,7 +189,7 @@ public class Parser {
 
 	private Statement.For forStatement() {
 		this.consumeOrThrow(IDENTIFIER, "Expected variable name after 'for'.");
-		Statement.Var iterator = this.parseVariable(true);
+		Statement.Var iterator = this.parseVariable(true, false);
 		this.consumeOrThrow(COLON, "Expected ':' after variable name.");
 		Expression iterable = this.expression();
 		this.consumeOrThrow(LEFT_BRACE, "Expected '{' after for loop iterable.");

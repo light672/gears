@@ -16,6 +16,8 @@ abstract class Statement {
 		R visitForStatement(For statement);
 
 		R visitReturnStatement(Return statement);
+
+		R visitFunctionStatement(Function statement);
 	}
 
 	static class ExpressionStatement extends Statement {
@@ -125,6 +127,23 @@ abstract class Statement {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitReturnStatement(this);
+		}
+	}
+
+	static class Function extends Statement {
+		Function(List<Var> parameters, Type returnType, List<Statement> body) {
+			this.parameters = parameters;
+			this.returnType = returnType;
+			this.body = body;
+		}
+
+		final List<Var> parameters;
+		final Type returnType;
+		final List<Statement> body;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitFunctionStatement(this);
 		}
 	}
 
