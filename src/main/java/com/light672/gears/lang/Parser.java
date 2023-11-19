@@ -1,19 +1,19 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.light672.roboscript.lang.Token.TokenType.*;
+import static com.light672.gears.lang.Token.TokenType.*;
 
 public class Parser {
-	private final RoboScript roboScriptInstance;
+	private final Gears gearsInstance;
 	private Token previous;
 	private Token current;
 
 	private Scanner scanner;
 
-	Parser(RoboScript roboScriptInstance) {
-		this.roboScriptInstance = roboScriptInstance;
+	Parser(Gears gearsInstance) {
+		this.gearsInstance = gearsInstance;
 	}
 
 	List<Statement> parse(String source) {
@@ -431,7 +431,7 @@ public class Parser {
 	}
 
 	private void reportError(int line, String finalMessage) {
-		this.roboScriptInstance.reportCompilationError("line " + line + ": " + finalMessage);
+		this.gearsInstance.reportCompilationError("line " + line + ": " + finalMessage);
 	}
 
 	private void synchronize() {

@@ -1,8 +1,8 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.light672.roboscript.lang.Token.TokenType.*;
+import static com.light672.gears.lang.Token.TokenType.*;
 
 /**
  * The Scanner class is responsible for tokenizing the source code of a RoboScript program.

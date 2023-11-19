@@ -1,4 +1,4 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 import java.io.Serial;
 
 public class RuntimeError extends RuntimeException {

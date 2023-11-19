@@ -1,4 +1,4 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 public interface OpCode {
 	byte OP_CONSTANT = 0;
 	byte OP_TRUE = 1;

@@ -1,4 +1,4 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 public class Type {
 	static class Any extends Type {
 		Any(boolean nullable) {

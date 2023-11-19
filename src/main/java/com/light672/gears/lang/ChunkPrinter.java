@@ -1,5 +1,5 @@
-package com.light672.roboscript.lang;
-import static com.light672.roboscript.lang.OpCode.*;
+package com.light672.gears.lang;
+import static com.light672.gears.lang.OpCode.*;
 
 public class ChunkPrinter {
 	private int printCounter = 0;

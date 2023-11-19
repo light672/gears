@@ -1,8 +1,8 @@
-package com.light672.roboscript.lang;
-import static com.light672.roboscript.lang.OpCode.*;
+package com.light672.gears.lang;
+import static com.light672.gears.lang.OpCode.*;
 
 public class VirtualMachine {
-	private final RoboScript roboScriptInstance;
+	private final Gears gearsInstance;
 	private Chunk chunk;
 
 
@@ -16,14 +16,14 @@ public class VirtualMachine {
 
 	boolean stopQueued = false;
 
-	VirtualMachine(RoboScript roboScriptInstance, int stackSize, int globalsSize) {
-		this.roboScriptInstance = roboScriptInstance;
+	VirtualMachine(Gears gearsInstance, int stackSize, int globalsSize) {
+		this.gearsInstance = gearsInstance;
 		this.stack = new Object[stackSize];
 		this.globalVariables = new Object[globalsSize];
 	}
 
-	VirtualMachine(RoboScript roboScriptInstance) {
-		this(roboScriptInstance, 256, 256);
+	VirtualMachine(Gears gearsInstance) {
+		this(gearsInstance, 256, 256);
 	}
 
 	void interpret(Chunk chunk) {
@@ -38,7 +38,7 @@ public class VirtualMachine {
 		try {
 			this.run();
 		} catch (RuntimeError e) {
-			this.roboScriptInstance.reportRuntimeError(
+			this.gearsInstance.reportRuntimeError(
 					"[line " + this.chunk.lines[this.programCounter] + "]: " + e.message);
 		}
 	}
@@ -53,7 +53,7 @@ public class VirtualMachine {
 				case OP_TRUE -> this.pushStack(true);
 				case OP_FALSE -> this.pushStack(false);
 				case OP_NULL -> this.pushStack(null);
-				case OP_POP -> this.roboScriptInstance.handlePrintStatement(this.stringify(this.popStack()) + '\n');
+				case OP_POP -> this.gearsInstance.handlePrintStatement(this.stringify(this.popStack()) + '\n');
 				case OP_ADD -> this.addInstruction();
 				case OP_SUBTRACT -> this.subtractInstruction();
 				case OP_MULTIPLY -> this.multiplyInstruction();

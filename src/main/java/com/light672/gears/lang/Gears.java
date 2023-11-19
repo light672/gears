@@ -1,14 +1,14 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 import java.util.List;
 
-public abstract class RoboScript {
+public abstract class Gears {
 
 	/**
 	 * Includes a module globally that can be accessed through any RoboScript instance.
 	 *
 	 * @param module The included module.
 	 */
-	public static void includeModule(RoboScriptModule module) {
+	public static void includeModule(GearsModule module) {
 
 	}
 

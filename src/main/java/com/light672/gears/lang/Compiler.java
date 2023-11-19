@@ -1,16 +1,16 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.light672.roboscript.lang.OpCode.*;
+import static com.light672.gears.lang.OpCode.*;
 
 public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Void> {
-	private final RoboScript roboScriptInstance;
+	private final Gears gearsInstance;
 	private final List<Byte> code = new ArrayList<>();
 	private final List<Object> constants = new ArrayList<>();
 
-	Compiler(RoboScript roboScriptInstance) {
-		this.roboScriptInstance = roboScriptInstance;
+	Compiler(Gears gearsInstance) {
+		this.gearsInstance = gearsInstance;
 	}
 
 	Chunk compile(List<Statement> statements) {

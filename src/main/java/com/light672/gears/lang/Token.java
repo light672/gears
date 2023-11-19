@@ -1,4 +1,4 @@
-package com.light672.roboscript.lang;
+package com.light672.gears.lang;
 final class Token {
 	final TokenType type;
 	final String lexeme;
