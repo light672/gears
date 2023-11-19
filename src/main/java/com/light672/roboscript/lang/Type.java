@@ -4,6 +4,11 @@ public class Type {
 		Any(boolean nullable) {
 			super(nullable);
 		}
+
+		@Override
+		public java.lang.String toString() {
+			return "ANY" + (this.nullable ? "?" : "");
+		}
 	}
 
 	static class Object extends Type {
@@ -13,11 +18,21 @@ public class Type {
 		}
 
 		final Token identifier;
+
+		@Override
+		public java.lang.String toString() {
+			return "OBJECT" + (this.nullable ? "?" : "");
+		}
 	}
 
 	static class Number extends Type {
 		Number() {
 			super(false);
+		}
+
+		@Override
+		public java.lang.String toString() {
+			return "NUMBER";
 		}
 	}
 
@@ -25,17 +40,32 @@ public class Type {
 		Bool() {
 			super(false);
 		}
+
+		@Override
+		public java.lang.String toString() {
+			return "BOOL";
+		}
 	}
 
 	static class String extends Type {
 		String(boolean nullable) {
 			super(nullable);
 		}
+
+		@Override
+		public java.lang.String toString() {
+			return "STRING" + (this.nullable ? "?" : "");
+		}
 	}
 
 	static class Range extends Type {
 		Range(boolean nullable) {
 			super(nullable);
+		}
+
+		@Override
+		public java.lang.String toString() {
+			return "RANGE" + (this.nullable ? "?" : "");
 		}
 	}
 
@@ -46,6 +76,11 @@ public class Type {
 		}
 
 		final Type entryType;
+
+		@Override
+		public java.lang.String toString() {
+			return "LIST" + (this.nullable ? "?" : "") + "<" + this.entryType.toString() + ">";
+		}
 	}
 
 	static class Map extends Type {
@@ -57,6 +92,11 @@ public class Type {
 
 		final Type keyType;
 		final Type valueType;
+
+		@Override
+		public java.lang.String toString() {
+			return "MAP" + (this.nullable ? "?" : "") + "<" + this.keyType.toString() + ", " + this.valueType.toString() + ">";
+		}
 	}
 
 	static class Function extends Type {
@@ -69,6 +109,16 @@ public class Type {
 
 		final java.util.List<Type> argumentTypes;
 		final Type returnType;
+
+		@Override
+		public java.lang.String toString() {
+			StringBuilder arguments = new StringBuilder("<");
+			for (Type t : this.argumentTypes) {
+				arguments.append(t.toString()).append(", ");
+			}
+			return "FUNCTION" + (this.nullable ? "?" : "") + arguments.substring(0,
+					arguments.length() - 2) + "> -> " + this.returnType.toString();
+		}
 	}
 
 	static class Class extends Type {
@@ -78,6 +128,11 @@ public class Type {
 		}
 
 		final Token identifier;
+
+		@Override
+		public java.lang.String toString() {
+			return "CLASS " + this.identifier.lexeme;
+		}
 	}
 
 
