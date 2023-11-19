@@ -87,9 +87,11 @@ abstract class Statement {
 
 	static class While extends Statement {
 		While(Expression condition, List<Statement> body) {
+			this.condition = condition;
 			this.body = body;
 		}
 
+		final Expression condition;
 		final List<Statement> body;
 
 		@Override
