@@ -203,7 +203,7 @@ public class Parser {
 
 	private Statement.Return returnStatement() {
 		Token keyword = this.previous;
-		Expression returnValue = !this.isNextToken(SEMICOLON) ? this.expression() : null;
+		Expression returnValue = !this.isNextToken(SEMICOLON) ? this.expression() : new Expression.Literal(null);
 		this.consumeOrThrow(SEMICOLON, "Expected ';' after return statement.");
 		return new Statement.Return(keyword, returnValue);
 	}
