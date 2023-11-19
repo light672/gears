@@ -45,7 +45,8 @@ public class Parser {
 				return this.statement();
 			}
 		} catch (ParseError error) {
-			throw new IllegalArgumentException("temp");
+			this.synchronize();
+			return this.declaration();
 		}
 	}
 
@@ -96,14 +97,8 @@ public class Parser {
 		return switch (typeToken.type) {
 			case ANY -> new Type.Any(nullable);
 			case STRING -> new Type.String(nullable);
-			case NUMBER -> {
-				if (nullable) throw this.error("Type 'number' cannot be nullable.");
-				yield new Type.Number();
-			}
-			case BOOL -> {
-				if (nullable) throw this.error("Type 'bool' cannot be nullable.");
-				yield new Type.Bool();
-			}
+			case NUMBER -> new Type.Number();
+			case BOOL -> new Type.Bool();
 			case RANGE -> new Type.Range(nullable);
 			case LIST -> {
 				if (!this.matchAndAdvance(LESS)) yield new Type.List(new Type.Any(true), nullable);
@@ -437,6 +432,18 @@ public class Parser {
 
 	private void reportError(int line, String finalMessage) {
 		this.roboScriptInstance.reportCompilationError("line " + line + ": " + finalMessage);
+	}
+
+	private void synchronize() {
+		while (!this.isAtEnd()) {
+			if (this.previous != null && this.previous.type == SEMICOLON) return;
+			switch (this.current.type) {
+				case CLASS, FUNCTION, VAR, FOR, IF, WHILE, LOOP, RETURN -> {
+					return;
+				}
+			}
+			this.advance();
+		}
 	}
 
 	private static class ParseError extends RuntimeException {

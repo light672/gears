@@ -1,5 +1,5 @@
 var a = 3;
-var b: string = "eawdkawd";
+var b: string? = "eawdkawd";
 if true {
 	print("woahh");
 } elif true {
