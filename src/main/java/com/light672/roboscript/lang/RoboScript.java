@@ -14,22 +14,14 @@ public abstract class RoboScript {
 
 	public void runString(String source) {
 		Parser parser = new Parser(this);
-		// List<Statement> statements = parser.parse(source);
-		List<Statement> statements = List.of(
-				new Statement.If(new Expression.Literal(true), List.of(
-						new Statement.ExpressionStatement(new Expression.Literal("ended up being true"))
-				), List.of(
-						new Statement.ExpressionStatement(new Expression.Literal("ended up being false"))
-				)),
-				new Statement.ExpressionStatement(new Expression.Literal("end"))
-		);
-
-		Compiler compiler = new Compiler(this);
+		List<Statement> statements = parser.parse(source);
+		new ASTPrinter(statements).print();
+		/*Compiler compiler = new Compiler(this);
 		Chunk chunk = compiler.compile(statements);
 		new ChunkPrinter(chunk).print();
 		System.out.println("\n");
 		VirtualMachine vm = new VirtualMachine(this);
-		vm.interpret(chunk);
+		vm.interpret(chunk);*/
 	}
 
 	/**

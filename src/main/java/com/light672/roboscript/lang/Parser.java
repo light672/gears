@@ -19,7 +19,8 @@ public class Parser {
 	List<Statement> parse(String source) {
 		List<Statement> statements = new ArrayList<>();
 		this.scanner = new Scanner(source);
-		while (!this.isAtEnd()) {
+		this.advance();
+		while (!this.matchAndAdvance(EOF)) {
 			statements.add(this.declaration());
 		}
 		return statements;
@@ -27,7 +28,7 @@ public class Parser {
 
 	private List<Statement> parseBlock() {
 		List<Statement> statements = new ArrayList<>();
-		while (this.isNextToken(RIGHT_BRACE) && !this.isAtEnd()) {
+		while (!this.isNextToken(RIGHT_BRACE) && !this.isAtEnd()) {
 			statements.add(this.declaration());
 		}
 		this.consumeOrThrow(RIGHT_BRACE, "Expected '}' to close block.");
@@ -44,8 +45,7 @@ public class Parser {
 				return this.statement();
 			}
 		} catch (ParseError error) {
-			// synchronize
-			return null;
+			throw new IllegalArgumentException("temp");
 		}
 	}
 
@@ -436,7 +436,7 @@ public class Parser {
 	}
 
 	private void reportError(int line, String finalMessage) {
-
+		this.roboScriptInstance.reportCompilationError("line " + line + ": " + finalMessage);
 	}
 
 	private static class ParseError extends RuntimeException {

@@ -34,6 +34,11 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 	}
 
 	@Override
+	public Void visitVarStatement(Statement.Var statement) {
+		return null;
+	}
+
+	@Override
 	public Void visitIfStatement(Statement.If statement) {
 		this.accept(statement.condition);
 		int thenJump = this.emitJump(OP_JUMP_IF_FALSE);
@@ -56,6 +61,46 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 	}
 
 	@Override
+	public Void visitWhileStatement(Statement.While statement) {
+		return null;
+	}
+
+	@Override
+	public Void visitForStatement(Statement.For statement) {
+		return null;
+	}
+
+	@Override
+	public Void visitReturnStatement(Statement.Return statement) {
+		return null;
+	}
+
+	@Override
+	public Void visitFunctionStatement(Statement.Function statement) {
+		return null;
+	}
+
+	@Override
+	public Void visitGroupingExpression(Expression.Grouping expression) {
+		return null;
+	}
+
+	@Override
+	public Void visitVariableExpression(Expression.Variable expression) {
+		return null;
+	}
+
+	@Override
+	public Void visitAssignExpression(Expression.Assign expression) {
+		return null;
+	}
+
+	@Override
+	public Void visitCallExpression(Expression.Call expression) {
+		return null;
+	}
+
+	@Override
 	public Void visitBinaryExpression(Expression.Binary expression) {
 		this.accept(expression.left);
 		this.accept(expression.right);
@@ -64,7 +109,25 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 			case SUBTRACTION -> OP_SUBTRACT;
 			case MULTIPLICATION -> OP_MULTIPLY;
 			case DIVISION -> OP_DIVIDE;
+			case MODULO -> OP_MODULO;
+			case EXPONENT -> OP_EXPONENT;
+			case EQUAL -> OP_EQUAL;
+			case NOT_EQUAL -> OP_NOT_EQUAL;
+			case GREATER -> OP_GREATER;
+			case GREATER_EQUAL -> OP_GREATER_EQUAL;
+			case LESS -> OP_LESS;
+			case LESS_EQUAL -> OP_LESS_EQUAL;
 		});
+		return null;
+	}
+
+	@Override
+	public Void visitUnaryExpression(Expression.Unary expression) {
+		return null;
+	}
+
+	@Override
+	public Void visitLogicalExpression(Expression.Logical expression) {
 		return null;
 	}
 

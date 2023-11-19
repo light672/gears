@@ -2,10 +2,14 @@ package com.light672.roboscript;
 
 import com.light672.roboscript.lang.RoboScript;
 
-public class Main {
-	public static void main(String[] args) {
-		RoboScript roboScript = new RoboScript() {
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+public class Main {
+	public static void main(String[] args) throws IOException {
+		if (args.length != 1) return;
+		RoboScript roboScript = new RoboScript() {
 			@Override
 			public void handlePrintStatement(String message) {
 				System.out.print(message);
@@ -26,6 +30,6 @@ public class Main {
 				System.out.println("WARNING: " + message);
 			}
 		};
-		roboScript.runString("");
+		roboScript.runString(Files.readString(Paths.get(args[0])));
 	}
 }

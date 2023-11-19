@@ -14,7 +14,7 @@ public class ASTPrinter {
 		}
 	}
 
-	void printStatement(Statement statement, int indentLevel) {
+	private void printStatement(Statement statement, int indentLevel) {
 		for (int i = 0; i < indentLevel; i++) {
 			System.out.print("   ");
 		}
@@ -81,11 +81,11 @@ public class ASTPrinter {
 	 *
 	 * @param expression The expression being printed.
 	 */
-	void printExpression(Expression expression) {
+	private void printExpression(Expression expression) {
 		System.out.print("(");
 		if (expression instanceof Expression.Literal literal) {
 			if (literal.literal == null) System.out.print("NULL");
-			else System.out.println(literal.literal);
+			else System.out.print(literal.literal);
 		} else if (expression instanceof Expression.Binary binary) {
 			String operation = switch (binary.operation) {
 				case ADDITION -> "ADD";
@@ -130,14 +130,14 @@ public class ASTPrinter {
 			System.out.print(" ");
 			this.printExpression(logical.right);
 		} else if (expression instanceof Expression.Call call) {
-			System.out.print("CALL [");
+			System.out.print("CALL <");
 			for (int i = 0; i < call.arguments.size(); i++) {
 				this.printExpression(call.arguments.get(i));
 				if (i != call.arguments.size() - 1) {
 					System.out.print(", ");
 				}
 			}
-			System.out.print("]");
+			System.out.print(">");
 		}
 		System.out.print(")");
 	}
