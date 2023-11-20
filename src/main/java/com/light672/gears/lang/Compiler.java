@@ -62,6 +62,14 @@ public class Compiler implements Statement.Visitor<Void>, Expression.Visitor<Voi
 
 	@Override
 	public Void visitWhileStatement(Statement.While statement) {
+		int loopStart = this.code.size();
+		this.accept(statement.condition);
+		int exitJump = this.emitJump(OP_JUMP_IF_FALSE);
+		this.emitByte(OP_POP);
+		this.accept(statement.body);
+		this.emitLoop(loopStart);
+		this.patchJump(exitJump);
+		this.emitByte(OP_POP);
 		return null;
 	}
 
